@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>後台管理</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        img { max-height: 80px; }
+        form { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 商品管理後台</h1>
+
+    <h2>📦 商品清單</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>圖片</th>
+                <th>描述</th>
+                <th>價格</th>
+                <th>數量</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td><img src="{{ product.image_url }}" alt="商品圖片"></td>
+                <td>{{ product.description }}</td>
+                <td>${{ product.price }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>
+                    <form method="POST" action="/delete-product/{{ product.id }}" style="display:inline;">
+                        <button type="submit" onclick="return confirm('確定要下架這個商品嗎？')">下架</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>➕ 新增商品</h2>
+    <form method="POST" action="/add-product">
+        <label>價格：<input type="number" step="0.01" name="price" required></label><br><br>
+        <label>數量：<input type="number" name="quantity" required></label><br><br>
+        <label>圖片連結：<input type="text" name="image_url" required></label><br><br>
+        <label>描述：<textarea name="description" rows="3" cols="40" required></textarea></label><br><br>
+        <button type="submit">新增商品</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>首頁</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-5">
+    <h1 class="mb-4">歡迎來到電商網站</h1>
+    {% if nickname %}
+        <p>您好，{{ nickname }}！</p>
+        <a href="/logout" class="btn btn-outline-danger">登出</a>
+    {% else %}
+        <a href="/login" class="btn btn-primary">登入</a>
+        <a href="/register" class="btn btn-success">註冊</a>
+    {% endif %}
+    <hr>
+    <a href="/product" class="btn btn-info">瀏覽商品</a>
+    <a href="/cart" class="btn btn-warning">購物車</a>
+</body>
+</html>
