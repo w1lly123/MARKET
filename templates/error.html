@@ -1,15 +1,16 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <title>錯誤訊息</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="p-5">
-    <div class="alert alert-danger">
-        <h4>錯誤！</h4>
-        <p>{{ msg }}</p>
+{% extends "layout.html" %}
+
+{% block title %}
+    發生錯誤
+{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1 text-danger">Oops!</h1>
+    <h2 class="mb-4">發生了一些錯誤</h2>
+    <div class="alert alert-warning" role="alert">
+        {{ msg or "未知的錯誤，請聯繫管理員。" }}
     </div>
-    <a href="/" class="btn btn-secondary">回首頁</a>
-</body>
-</html>
+    <a href="{{ url_for('home') }}" class="btn btn-primary mt-3">返回首頁</a>
+</div>
+{% endblock %}

@@ -1,21 +1,39 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <title>首頁</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="p-5">
-    <h1 class="mb-4">歡迎來到電商網站</h1>
-    {% if nickname %}
-        <p>您好，{{ nickname }}！</p>
-        <a href="/logout" class="btn btn-outline-danger">登出</a>
-    {% else %}
-        <a href="/login" class="btn btn-primary">登入</a>
-        <a href="/register" class="btn btn-success">註冊</a>
-    {% endif %}
-    <hr>
-    <a href="/product" class="btn btn-info">瀏覽商品</a>
-    <a href="/cart" class="btn btn-warning">購物車</a>
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}
+    歡迎來到 MARKET
+{% endblock %}
+
+{% block content %}
+    <div class="p-5 mb-4 bg-light rounded-3 text-center">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">探索無限可能</h1>
+            <p class="fs-4">在 MARKET 找到您心儀的商品，開啟品質生活。</p>
+            <button class="btn btn-primary btn-lg" type="button">立即選購</button>
+        </div>
+    </div>
+
+    <h2 class="mb-4">精選商品</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {# 假設後端傳來一個 products 列表 #}
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ product.image_url or url_for('static', filename='images/placeholder.png') }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.description[:50] ~ '...' }}</p>
+                    <h4 class="text-danger fw-bold">$ {{ product.price }}</h4>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <a href="{{ url_for('product', product_id=product.id) }}" class="btn btn-outline-primary w-100">查看詳情</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <p>目前沒有商品。</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

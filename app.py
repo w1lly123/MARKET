@@ -12,41 +12,43 @@ db.init_app(app)
 #首頁路由
 @app.route("/")
 def home():
-    return render_template("home.html")
+    products = Product.query.all()
+    return render_template("home.html",products = products)
 @app.route("/error")
 def error():
     msg = request.args.get("msg","發生錯誤，請重新連線")
-    return render_template("error.html",msg=msg)
+    return render_template("error.html", msg = msg)
     
 #註冊頁路由
-@app.route("/register")
+@app.route("/register",methods = ["GET","POST"])
 def register():
-    return render_template("register.html")
-
-    
-@app.route("/signup",methods=["POST"])
-def signup():
+    if request.method == 'GET':
+        return render_template("register.html")
     nickname = request.form.get("nickname")
     email = request.form.get("email")
     password = request.form.get("password")
     
-    existing_user = User.query.filter_by(email = email).first()
+    if not nickname or not email or not password:
+        return redirect("/error?msg=所有欄位皆為必填")
+    existing_user = User.query.filter_by(email=email).first()
     if existing_user:
-        return redirect("/error?msg=信箱已被註冊")
-    new_user = User(nickname = nickname, email = email, password = password)
+        return redirect("/error?msg=該信箱已被註冊")
+    new_user = User(nickname=nickname,email=email,password=password)
     db.session.add(new_user)
     db.session.commit()
     
     session["user_id"] = new_user.id
     session["nickname"] = new_user.nickname
+    session["is_admin"] = new_user.is_admin
     
     return redirect("/")
 
 #登入頁路由
-@app.route("/login",methods=["GET","POST"])
+@app.route("/login", methods=["GET","POST"])
 def login():
-    if request.method =="GET":
+    if request.method == "GET":
         return render_template("login.html")
+    
     email = request.form.get("email")
     password =  request.form.get("password")
     
@@ -54,14 +56,14 @@ def login():
         return redirect("/error?msg=信箱或密碼輸入錯誤")
     
     user = User.query.filter_by(email = email,password = password).first()
-    admin = User.query.filter_by(is_admin = True).first()
-    if admin:
-        return redirect("/admin")
-    if user is None:
-        return redirect("/error?msg=信箱或密碼輸入錯誤")
+    if not user:
+        return  redirect("/error?msg=找不到該用戶")
     session["user_id"] = user.id
     session["nickname"] = user.nickname
-    return redirect("/")
+    if user.is_admin:
+        return redirect("/admin")
+    else:
+        return  redirect("/")    
 
 #登出頁路由
 @app.route("/logout")
@@ -117,12 +119,15 @@ def add(product_id):
 
 @app.route("/admin")
 def admin():
-    user = User.query.filter_by(is_admin = True).first()
-    if user:
-        products = Product.query.all()
-        return render_template("admin.html",products = products)
-    else:
-        return  redirect("/error?msg=非法入侵")    
+    if "user_id" not in session:
+        return redirect("/login")
+    current_user = User.query.get(session["user_id"])
+    if not current_user or not current_user.is_admin:
+        return redirect("/error?msg=您沒有權限存取此頁面")
+
+    products = Product.query.all()
+    return render_template("admin.html",products = products)
+       
 
 @app.route("/add-product",methods = ["POST"])
 def add_product():
