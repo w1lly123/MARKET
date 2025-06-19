@@ -8,7 +8,7 @@
 <div class="card overflow-hidden border-0 shadow-sm">
     <div class="row g-0">
         <div class="col-md-6">
-            <img src="{{ product.image_url or url_for('static', filename='images/placeholder.png') }}" class="img-fluid rounded-start" alt="{{ product.name }}">
+            <img src="{{ product.image_url or url_for('main.static', filename='images/placeholder.png') }}" class="img-fluid rounded-start" alt="{{ product.name }}">
         </div>
         <div class="col-md-6 d-flex flex-column p-4">
             <div class="card-body">
@@ -16,7 +16,7 @@
                 <p class="card-text fs-5 text-muted">{{ product.description }}</p>
                 <h2 class="card-text text-danger my-4 fw-bolder">$ {{ product.price }}</h2>
                 
-                <form action="{{ url_for('add_to_cart') }}" method="post">
+                <form action="{{ url_for('main.add_to_cart') }}" method="post">
                     <input type="hidden" name="product_id" value="{{ product.id }}">
                     <div class="row g-2 align-items-center">
                         <div class="col-auto">

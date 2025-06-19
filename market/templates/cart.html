@@ -23,7 +23,7 @@
             <tr>
                 <td>
                     <div class="d-flex align-items-center">
-                        <img src="{{ item.image_url or url_for('static', filename='images/placeholder.png') }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
+                        <img src="{{ item.image_url or url_for('main.static', filename='images/placeholder.png') }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
                         <span>{{ item.name }}</span>
                     </div>
                 </td>
@@ -31,7 +31,7 @@
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-end fw-bold">$ {{ item.price * item.quantity }}</td>
                 <td>
-                    <a href="{{ url_for('remove_from_cart', item_id=item.id) }}" class="btn btn-outline-danger btn-sm">
+                    <a href="{{ url_for('main.remove_from_cart', item_id=item.id) }}" class="btn btn-outline-danger btn-sm">
                         <i class="bi bi-trash3"></i>
                     </a>
                 </td>
@@ -61,7 +61,7 @@
 <div class="text-center py-5">
     <h4>您的購物車是空的</h4>
     <p class="text-muted">快去賣場逛逛吧！</p>
-    <a href="{{ url_for('home') }}" class="btn btn-primary">繼續購物</a>
+    <a href="{{ url_for('main.home') }}" class="btn btn-primary">繼續購物</a>
 </div>
 {% endif %}
 {% endblock %}

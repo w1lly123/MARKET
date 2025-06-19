@@ -1,38 +1,42 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    會員登入
+    建立新帳戶
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
+    <div class="col-md-7 col-lg-6">
         <div class="card shadow-lg border-0 rounded-lg mt-5">
-            <div class="card-header"><h3 class="text-center font-weight-light my-4">會員登入</h3></div>
+            <div class="card-header"><h3 class="text-center font-weight-light my-4">建立新帳戶</h3></div>
             <div class="card-body">
-                
+
                 {% if request.args.get('msg') %}
                 <div class="alert alert-danger" role="alert">
                     {{ request.args.get('msg') }}
                 </div>
                 {% endif %}
-                
-                <form action="{{ url_for('login') }}" method="post">
+
+                <form action="{{ url_for('main.register') }}" method="post">
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="nickname" name="nickname" type="text" placeholder="您的暱稱" required />
+                        <label for="nickname">暱稱</label>
+                    </div>
                     <div class="form-floating mb-3">
                         <input class="form-control" id="email" name="email" type="email" placeholder="name@example.com" required />
                         <label for="email">電子信箱</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input class="form-control" id="password" name="password" type="password" placeholder="Password" required />
+                        <input class="form-control" id="password" name="password" type="password" placeholder="設定密碼" required />
                         <label for="password">密碼</label>
                     </div>
                     <div class="d-grid mt-4 mb-0">
-                        <button class="btn btn-primary btn-lg" type="submit">登入</button>
+                        <button class="btn btn-primary btn-lg" type="submit">註冊</button>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-center py-3">
-                <div class="small"><a href="{{ url_for('register') }}">還沒有帳號？前往註冊</a></div>
+                <div class="small"><a href="{{ url_for('main.login') }}">已經有帳號了？前往登入</a></div>
             </div>
         </div>
     </div>
