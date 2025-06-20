@@ -18,6 +18,16 @@ class Product(db.Model):
     image_url = db.Column(db.String(200),nullable = False)
     description =  db.Column(db.Text,nullable = False)
 
+class CartItem(db.Model):
+    __tablename__ = 'cart_item'
+    id = db.Column(db.Integer,primary_key = True, default = 1)
+    
+    #與User和Product建立多對一外件關聯
+    user_id = db.Column(db.Integer , db.ForeignKey('user.id'), nullable = False)
+    product_id = db.Column(db.Integer, db.ForeignKey("product.id"),nullable = False)
+    
+    product = db.relationship('Product')
+
 class Order(db.Model):
     __tablename__ = "order"
     id = db.Column(db.Integer,primary_key = True)
