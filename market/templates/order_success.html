@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    訂單已成功送出
+{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5">
+    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+    <h1 class="display-4 mt-3">感謝您的訂購！</h1>
+    <p class="lead">您的訂單已成功送出，訂單編號為 #{{ order_id }}。</p>
+    <p>我們會盡快為您處理。</p>
+    <a href="{{ url_for('main.home') }}" class="btn btn-primary mt-3">返回首頁</a>
+</div>
+{% endblock %}
