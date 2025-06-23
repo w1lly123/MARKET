@@ -42,7 +42,6 @@ class Order(db.Model):
     # 建立 Order 和 OrderItem 之間的一對多關聯
     items = db.relationship('OrderItem', backref='order', lazy=True, cascade="all, delete-orphan")
     
-    # 【新增】訂單項目模型
 class OrderItem(db.Model):
     __tablename__ = 'order_item'
     id = db.Column(db.Integer, primary_key=True)

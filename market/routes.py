@@ -74,7 +74,6 @@ def login():
 #登出路由，清除session，並導到主頁
 @main.route("/logout")
 def logout():
-    # 修正點：使用 session.clear() 更簡潔
     session.clear()
     return redirect(url_for('main.home'))
 
@@ -124,7 +123,6 @@ def add_to_cart():
             break
             
     if not found:
-        # 【購物車修正】加入 name 和 image_url
         cart.append({
             "id": product.id,
             "name": product.name,
@@ -190,17 +188,8 @@ def checkout():
         return redirect(url_for('main.login'))
     user = db.session.get(User, session['user_id'])
     
-    # --- 加入 print 陳述句來檢查 ---
-    print("\n--- 進入 checkout 路由 ---")
-    print(f"找到的使用者: {user.nickname} (ID: {user.id})")
-    
     cart_items = user.cart_items # 獲取購物車項目
-    
-    print(f"透過 user.cart_items 查詢到的購物車內容: {cart_items}")
-    print(f"購物車項目數量: {len(cart_items) if cart_items else 0}")
-    print("------------------------\n")
-    # -----------------------------
-    
+
     if not cart_items:
         return redirect(url_for('main.cart'))
     
