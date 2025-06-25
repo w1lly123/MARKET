@@ -1,39 +1,31 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block title %}
-    歡迎來到 MARKET
-{% endblock %}
+{% block title %}首頁 - 所有商品{% endblock %}
 
 {% block content %}
-    <div class="p-5 mb-4 bg-light rounded-3 text-center">
-        <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">探索無限可能</h1>
-            <p class="fs-4">在 MARKET 找到您心儀的商品，開啟品質生活。</p>
-            <button class="btn btn-primary btn-lg" type="button">立即選購</button>
-        </div>
+<div class="p-4 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">探索我們的商品</h1>
+        <p class="col-md-8 fs-4">從最新科技到時尚單品，找到您心儀的一切。</p>
     </div>
+</div>
 
-    <h2 class="mb-4">精選商品</h2>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        {# 假設後端傳來一個 products 列表 #}
-        {% for product in products %}
-        <div class="col">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ product.image_url or url_for('main.static', filename='images/placeholder.png') }}" class="card-img-top" alt="{{ product.name }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text text-muted">{{ product.description[:50] ~ '...' }}</p>
-                    <h4 class="text-danger fw-bold">$ {{ product.price }}</h4>
-                </div>
-                <div class="card-footer bg-transparent border-top-0">
-                    <a href="{{ url_for('main.product', product_id=product.id) }}" class="btn btn-outline-primary w-100">查看詳情</a>
-                </div>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for product in products %}
+    <div class="col">
+        <div class="card h-100 shadow-sm product-card">
+            <img src="{{ product.image_url or 'https://via.placeholder.com/400x300.png?text=No+Image' }}" class="card-img-top" alt="{{ product.name }}" style="aspect-ratio: 4/3; object-fit: cover;">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text text-muted">NT$ {{ product.price|int }}</p>
+                <a href="{{ url_for('main.product', product_id=product.id) }}" class="btn btn-primary w-100">查看詳情</a>
             </div>
         </div>
-        {% else %}
-        <div class="col-12">
-            <p>目前沒有商品。</p>
-        </div>
-        {% endfor %}
     </div>
+    {% else %}
+    <div class="col-12">
+        <p class="text-center">目前沒有任何商品。</p>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

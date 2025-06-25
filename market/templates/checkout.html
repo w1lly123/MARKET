@@ -1,67 +1,51 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block title %}
-    結帳
-{% endblock %}
+{% block title %}結帳{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-7">
-            <h2 class="mb-4">配送資訊</h2>
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form action="{{ url_for('main.place_order') }}" method="post">
-                        <div class="mb-3">
-                            <label for="nickname" class="form-label">收件人姓名</label>
-                            <input type="text" class="form-control" id="nickname" value="{{ session.get('nickname') }}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="shipping_address" class="form-label">配送地址</label>
-                            <textarea class="form-control" id="shipping_address" name="shipping_address" rows="3" placeholder="請輸入您的詳細配送地址" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">付款方式</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="payment_method" id="cod" value="cod" checked>
-                                <label class="form-check-label" for="cod">
-                                    貨到付款
-                                </label>
-                            </div>
-                        </div>
-                        <hr class="my-4">
-                        <div class="d-grid">
-                            <button class="btn btn-primary btn-lg" type="submit">確認下單</button>
-                        </div>
-                    </form>
+<div class="row g-5">
+    <div class="col-md-7 col-lg-8">
+        <h2 class="mb-3">配送資訊</h2>
+        <form action="{{ url_for('main.place_order') }}" method="POST" class="needs-validation" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="shipping_address" class="form-label">完整配送地址</label>
+                    <textarea class="form-control" id="shipping_address" name="shipping_address" rows="3" placeholder="請輸入您的收件地址" required></textarea>
+                    <div class="invalid-feedback">
+                        請填寫配送地址。
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-5">
-            <h2 class="mb-4">訂單摘要</h2>
-            <div class="card shadow-sm">
-                <div class="card-header bg-light py-3">
-                    <h5 class="mb-0">您的購物車</h5>
+
+            <hr class="my-4">
+
+            <button class="w-100 btn btn-primary btn-lg" type="submit">確認下單</button>
+        </form>
+    </div>
+
+    <div class="col-md-5 col-lg-4 order-md-last">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-primary">您的訂單</span>
+            <span class="badge bg-primary rounded-pill">{{ cart_items|length }}</span>
+        </h4>
+        <ul class="list-group mb-3">
+            {% for item in cart_items %}
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+                <div>
+                    <h6 class="my-0">{{ item.product.name }}</h6>
+                    <small class="text-muted">數量: {{ item.quantity }}</g>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        {% for item in cart_items %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="my-0">{{ item.product.name }}</h6>
-                                <small class="text-muted">數量: {{ item.quantity }}</small>
-                            </div>
-                            <span class="text-muted">${{ (item.product.price * item.quantity)|round(2) }}</span>
-                        </li>
-                        {% endfor %}
-                        <li class="list-group-item d-flex justify-content-between bg-light">
-                            <span>總金額 (TWD)</span>
-                            <strong>${{ total_price|round(2) }}</strong>
-                        </li>
-                    </ul>
+                <span class="text-muted">NT$ {{ (item.product.price * item.quantity)|int }}</span>
+            </li>
+            {% endfor %}
+            <li class="list-group-item d-flex justify-content-between bg-light">
+                <div class="text-success">
+                    <h6 class="my-0">訂單總計</h6>
                 </div>
-            </div>
-        </div>
+                <strong class="text-success">NT$ {{ total_price|int }}</strong>
+            </li>
+        </ul>
     </div>
 </div>
 {% endblock %}

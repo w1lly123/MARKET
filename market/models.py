@@ -10,6 +10,7 @@ class User(db.Model):
     password = db.Column(db.String(255),nullable = False)
     is_admin = db.Column(db.Boolean,default = False, nullable = False)
     cart_items = db.relationship('CartItem', backref='user', lazy=True, cascade="all, delete-orphan")
+    orders = db.relationship('Order', backref='user', lazy=True)
 #Product模型    
 class Product(db.Model):
     __tablename__ = "product"
@@ -22,8 +23,8 @@ class Product(db.Model):
 
 class CartItem(db.Model):
     __tablename__ = 'cart_item'
-    id = db.Column(db.Integer,primary_key = True, default = 1)
-    
+    id = db.Column(db.Integer,primary_key = True)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
     #與User和Product建立多對一外件關聯
     user_id = db.Column(db.Integer , db.ForeignKey('user.id'), nullable = False)
     product_id = db.Column(db.Integer, db.ForeignKey("product.id"),nullable = False)

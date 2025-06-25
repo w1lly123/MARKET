@@ -1,16 +1,16 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block title %}
-    發生錯誤
-{% endblock %}
+{% block title %}發生錯誤{% endblock %}
 
 {% block content %}
-<div class="text-center py-5">
-    <h1 class="display-1 text-danger">Oops!</h1>
-    <h2 class="mb-4">發生了一些錯誤</h2>
-    <div class="alert alert-warning" role="alert">
-        {{ msg or "未知的錯誤，請聯繫管理員。" }}
+<div class="py-5 text-center">
+    <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+    <h1 class="display-4 mt-3">喔不，發生了一些錯誤</h1>
+    <p class="lead">我們遇到了一個問題，請稍後再試。</p>
+    <hr>
+    <div class="alert alert-danger" role="alert">
+        <strong>錯誤訊息：</strong> {{ msg or "未提供具體錯誤訊息。" }}
     </div>
-    <a href="{{ url_for('main.home') }}" class="btn btn-primary mt-3">返回首頁</a>
+    <a href="{{ url_for('main.home') }}" class="btn btn-secondary btn-lg mt-4">返回首頁</a>
 </div>
 {% endblock %}

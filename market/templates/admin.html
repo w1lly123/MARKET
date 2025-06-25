@@ -1,16 +1,76 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block title %}
-    管理後台
-{% endblock %}
+{% block title %}管理後台{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">管理後台</h1>
-    <p class="fs-5">歡迎，{{ session.get('nickname') }}！</p>
-    
-    <div class="list-group">
-      <a href="#" class="list-group-item list-group-item-action">管理商品</a>
-      <a href="#" class="list-group-item list-group-item-action">查看訂單</a>
-      <a href="#" class="list-group-item list-group-item-action">用戶管理</a>
+<h1 class="mb-4">管理後台</h1>
+
+<div class="card mb-5 shadow-sm">
+    <div class="card-header">
+        <h3>新增商品</h3>
     </div>
+    <div class="card-body">
+        <form action="{{ url_for('main.add_product') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="name" class="form-label">商品名稱</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="price" class="form-label">價格</label>
+                    <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                </div>
+                <div class="col-12">
+                    <label for="description" class="form-label">商品描述</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="col-12">
+                    <label for="image_url" class="form-label">圖片網址</label>
+                    <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://...">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">新增商品</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3>現有商品列表</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>名稱</th>
+                        <th>價格</th>
+                        <th>庫存</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price|int }}</td>
+                        <td>{{ product.quantity }}</td>
+                        <td class="text-center">
+                            <form action="{{ url_for('main.delete_product', product_id=product.id) }}" method="POST" onsubmit="return confirm('您確定要刪除此商品嗎?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <button type="submit" class="btn btn-danger btn-sm">刪除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

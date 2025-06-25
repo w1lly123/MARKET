@@ -1,40 +1,36 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block title %}
-    {{ product.name }}
-{% endblock %}
+{% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-<div class="card overflow-hidden border-0 shadow-sm">
-    <div class="row g-0">
-        <div class="col-md-6">
-            <img src="{{ product.image_url or url_for('main.static', filename='images/placeholder.png') }}" class="img-fluid rounded-start" alt="{{ product.name }}">
-        </div>
-        <div class="col-md-6 d-flex flex-column p-4">
-            <div class="card-body">
-                <h1 class="card-title display-5">{{ product.name }}</h1>
-                <p class="card-text fs-5 text-muted">{{ product.description }}</p>
-                <h2 class="card-text text-danger my-4 fw-bolder">$ {{ product.price }}</h2>
-                
-                <form action="{{ url_for('main.add_to_cart') }}" method="post">
-                    <input type="hidden" name="product_id" value="{{ product.id }}">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-auto">
-                            <label for="quantity" class="col-form-label">數量:</label>
-                        </div>
-                        <div class="col-auto">
-                            <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" style="width: 80px;">
-                        </div>
+<div class="row g-5">
+    <div class="col-md-6">
+        <img src="{{ product.image_url or 'https://via.placeholder.com/800x600.png?text=No+Image' }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
+    </div>
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold">{{ product.name }}</h1>
+        <h2 class="text-danger my-3">NT$ {{ product.price|int }}</h2>
+        <p class="fs-5">{{ product.description }}</p>
+        <hr>
+        {% if current_user %}
+            <form action="{{ url_for('main.add_to_cart') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <div class="row align-items-center g-2">
+                    <div class="col-auto">
+                        <label for="quantity" class="col-form-label">數量:</label>
                     </div>
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-cart-plus-fill"></i> 加入購物車
-                        </button>
+                    <div class="col-auto">
+                        <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="{{ product.quantity }}">
                     </div>
-                </form>
-
-            </div>
-        </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-success btn-lg w-100"><i class="bi bi-cart-plus-fill"></i> 加入購物車</button>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-lg w-100">請先登入以購買</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
