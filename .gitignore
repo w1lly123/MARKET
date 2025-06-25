@@ -1,0 +1,12 @@
+# .gitignore
+
+# 忽略虛擬環境資料夾
+venv/
+__pycache__/
+
+# 忽略敏感的環境變數檔案
+.env
+
+# 忽略本地的資料庫檔案 (如果是用 SQLite 的話)
+*.db
+*.sqlite3
