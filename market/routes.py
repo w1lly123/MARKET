@@ -33,7 +33,7 @@ def login():
         return controllers.handle_login_form()
     return controllers.show_login_page()
 
-@main.route("/logout")
+@main.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
     return controllers.handle_logout()

@@ -1,16 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}發生錯誤{% endblock %}
+{% block title %}發生錯誤 - 我的商店{% endblock %}
 
+{# 我們不希望錯誤頁面有導覽列和標準邊距，所以直接覆寫 content 區塊 #}
 {% block content %}
-<div class="py-5 text-center">
-    <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
-    <h1 class="display-4 mt-3">喔不，發生了一些錯誤</h1>
-    <p class="lead">我們遇到了一個問題，請稍後再試。</p>
-    <hr>
-    <div class="alert alert-danger" role="alert">
-        <strong>錯誤訊息：</strong> {{ msg or "未提供具體錯誤訊息。" }}
+<div class="fixed inset-0 flex items-center justify-center bg-gray-100">
+    <div class="text-center bg-white p-12 rounded-lg shadow-2xl max-w-lg mx-auto">
+        <svg class="mx-auto h-16 w-16 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h1 class="mt-6 text-2xl font-bold text-gray-800">發生了一些問題</h1>
+        <p class="mt-4 text-gray-600">{{ msg or '未知的錯誤，請稍後再試。' }}</p>
+        <div class="mt-8">
+            <a href="{{ url_for('main.home') }}" class="bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">返回首頁</a>
+        </div>
     </div>
-    <a href="{{ url_for('main.home') }}" class="btn btn-secondary btn-lg mt-4">返回首頁</a>
 </div>
 {% endblock %}
+
+{# 覆寫 nav 區塊讓它變成空的，這樣就不會顯示導覽列了 #}
+{% block nav %}{% endblock %}

@@ -1,5 +1,3 @@
-# 檔案: market/controllers.py (新檔案)
-
 from flask import render_template, request, redirect, url_for, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -9,52 +7,35 @@ from flask_jwt_extended import (
     set_access_cookies, unset_jwt_cookies, get_csrf_token
 )
 
-# --- 渲染頁面 (Page Rendering) 的 Controllers ---
 
 def show_home_page():
-    """顯示首頁"""
     products = Product.query.all()
     return render_template("home.html", products=products)
 
 def show_error_page():
-    """顯示錯誤頁面"""
     msg = request.args.get("msg", "發生錯誤，請重新連線")
     return render_template("error.html", msg=msg)
 
 def show_register_page():
-    """顯示註冊頁面"""
     return render_template("register.html")
 
 def show_login_page():
-    """顯示登入頁面"""
     return render_template("login.html")
 
 def show_product_page(product_id):
-    """顯示單一商品詳情頁"""
     product = db.session.get(Product, product_id)
     if not product:
         return redirect(url_for('main.error', msg="找不到此商品"))
     
-    csrf_token = None
-    encoded_token = request.cookies.get('access_token_cookie')
-    if encoded_token:
-        csrf_token = get_csrf_token(encoded_token)
-        
-    return render_template("product.html", product=product, csrf_token=csrf_token)
+    return render_template("product.html", product=product)
 
 def show_cart_page():
-    """顯示購物車頁面"""
     user_id = get_jwt_identity()
     user = db.session.get(User, user_id)
     cart_items = user.cart_items
     total_price = sum(item.product.price * item.quantity for item in cart_items)
-    
-    csrf_token = None
-    encoded_token = request.cookies.get('access_token_cookie')
-    if encoded_token:
-        csrf_token = get_csrf_token(encoded_token)
-        
-    return render_template("cart.html", cart_items=cart_items, total_price=total_price, csrf_token=csrf_token)
+     
+    return render_template("cart.html", cart_items=cart_items, total_price=total_price)
 
 def show_admin_page():
     """顯示管理後台頁面"""
@@ -63,12 +44,7 @@ def show_admin_page():
         
     products = Product.query.all()
     
-    csrf_token = None
-    encoded_token = request.cookies.get('access_token_cookie')
-    if encoded_token:
-        csrf_token = get_csrf_token(encoded_token)
-        
-    return render_template("admin.html", products=products, csrf_token=csrf_token)
+    return render_template("admin.html", products=products)
 
 def show_checkout_page():
     """顯示結帳頁面"""
@@ -79,13 +55,8 @@ def show_checkout_page():
         return redirect(url_for('main.cart'))
         
     total_price = sum(item.product.price * item.quantity for item in cart_items)
-    
-    csrf_token = None
-    encoded_token = request.cookies.get('access_token_cookie')
-    if encoded_token:
-        csrf_token = get_csrf_token(encoded_token)
 
-    return render_template('checkout.html', cart_items=cart_items, total_price=total_price, csrf_token=csrf_token)
+    return render_template('checkout.html', cart_items=cart_items, total_price=total_price)
 
 # --- 處理動作 (Action Handling) 的 Controllers ---
 
@@ -208,16 +179,21 @@ def handle_place_order():
     shipping_address = request.form.get('shipping_address')
     if not shipping_address:
         return redirect(url_for('main.error', msg="請填寫配送地址"))
-    
-    total_amount = sum(item.product.price * item.quantity for item in cart_items)
-    new_order = Order(user_id=user.id, shipping_address=shipping_address, total_amount=total_amount)
-    db.session.add(new_order)
-    
-    for item in cart_items:
-        db.session.add(OrderItem(order=new_order, product_id=item.product.id, quantity=item.quantity, price=item.product.price))
-    
-    for item in cart_items:
-        db.session.delete(item)
-    
-    db.session.commit()
+    try:
+        total_amount = sum(item.product.price * item.quantity for item in cart_items)
+        new_order = Order(user_id=user.id, shipping_address=shipping_address, total_amount=total_amount)
+        db.session.add(new_order)
+        
+        db.session.flush()
+        
+        for item in cart_items:
+            db.session.add(OrderItem(order=new_order, product_id=item.product.id, quantity=item.quantity, price=item.product.price))
+        
+        for item in cart_items:
+            db.session.delete(item)
+        
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return redirect(url_for('main.error',msg = "訂單處理失敗，請稍後再試"))
     return render_template('order_success.html', order_id=new_order.id)

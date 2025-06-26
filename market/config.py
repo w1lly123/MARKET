@@ -1,7 +1,6 @@
-# 檔案: market/config.py (最終正確版本)
-
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
@@ -26,3 +25,5 @@ class Config:
     JWT_COOKIE_SECURE = False  # 開發環境 (http) 必須為 False
     JWT_COOKIE_SAMESITE = "Lax" # 指定 SameSite 策略
     JWT_CSRF_IN_COOKIES = True # 啟用 CSRF 保護
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_CSRF_CHECK_FORM = True

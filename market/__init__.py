@@ -1,16 +1,18 @@
-# 檔案: market/__init__.py (最終正確版本)
-
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from .config import Config
-from flask_jwt_extended import JWTManager, get_jwt_identity, get_jwt
+from flask_jwt_extended import JWTManager, get_jwt_identity, get_csrf_token
+
 
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
 
 def create_app(config_class=Config):
+    """
+    應用程式工廠，用於建立和設定 Flask 應用實例。
+    """
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -19,27 +21,45 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    # 註冊藍圖
-    # 【注意】這裡導入的是 routes.py，請確保您的路由檔名正確
-    from .routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    from .models import User 
+    # --- 內容處理器 (Context Processors) ---
+    # 透過它們注入的變數，可以在所有 Jinja2 模板中直接使用。
 
-    # 註冊內容處理器，讓所有模板都能存取 current_user
     @app.context_processor
-    def inject_user():
+    def inject_current_user():
+        """
+        注入當前登入的使用者物件。
+        如果使用者未登入，則 current_user 為 None。
+        """
         try:
             identity = get_jwt_identity()
             if identity:
-                claims = get_jwt()
-                return dict(
-                    current_user={
-                        "id": identity,
-                        "is_admin": claims.get("is_admin"),
-                        "nickname": claims.get("nickname")
-                    }
-                )
+                # 從資料庫中查詢完整的使用者物件
+                user = db.session.get(User, identity)
+                return dict(current_user=user)
         except Exception:
+            # 在沒有請求上下文或 JWT 無效時，靜默處理
             pass
         return dict(current_user=None)
+
+    @app.context_processor
+    def inject_csrf_token():
+        """
+        注入 CSRF Token，方便在 AJAX 和表單中使用。
+        """
+        try:
+            # 必須在有 access_token_cookie 的情況下才能生成 CSRF Token
+            encoded_token = request.cookies.get('access_token_cookie')
+            if encoded_token:
+                return dict(csrf_token=get_csrf_token(encoded_token))
+        except Exception:
+            pass
+        return dict(csrf_token=None)
+
+
+    # --- 註冊藍圖 ---
+    # 確保在函式內部導入，避免循環依賴
+    from .routes import main as main_blueprint
+    app.register_blueprint(main_blueprint)
 
     return app

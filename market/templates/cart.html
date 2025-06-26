@@ -1,71 +1,63 @@
 {% extends "base.html" %}
 
-{% block title %}您的購物車{% endblock %}
+{% block title %}我的購物車 - 我的商店{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">您的購物車</h1>
+<h1 class="text-3xl font-bold mb-8 text-gray-800">我的購物車</h1>
 
-{% if cart_items %}
-<div class="table-responsive shadow-sm rounded">
-    <table class="table table-hover align-middle mb-0">
-        <thead class="table-light">
-            <tr>
-                <th scope="col" style="width: 10%;">商品</th>
-                <th scope="col" style="width: 40%;">名稱</th>
-                <th scope="col" class="text-end">單價</th>
-                <th scope="col" class="text-center">數量</th>
-                <th scope="col" class="text-end">小計</th>
-                <th scope="col" class="text-center">操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cart_items %}
-            <tr>
-                <td>
-                    <img src="{{ item.product.image_url or 'https://via.placeholder.com/100x100.png?text=No+Image' }}" class="img-fluid rounded" alt="{{ item.product.name }}">
-                </td>
-                <td><a href="{{ url_for('main.product', product_id=item.product.id) }}" class="text-decoration-none text-dark">{{ item.product.name }}</a></td>
-                <td class="text-end">NT$ {{ item.product.price|int }}</td>
-                <td class="text-center">{{ item.quantity }}</td>
-                <td class="text-end">NT$ {{ (item.product.price * item.quantity)|int }}</td>
-                
-                <td class="text-center">
-                    <form action="{{ url_for('main.remove_from_cart', item_id=item.id) }}" method="POST" class="d-inline">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                        <button type="submit" class="btn btn-outline-danger btn-sm" title="移除商品">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </td>
+<div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    {% if cart_items %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">單價</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">數量</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">小計</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for item in cart_items %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-16 w-16">
+                                <img class="h-16 w-16 rounded-md object-cover" src="{{ item.product.image_url or 'https://placehold.co/100x100/e2e8f0/cbd5e0?text=Img' }}" alt="[圖片] {{ item.product.name }}">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ item.product.name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$ {{ item.product.price|int }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.quantity }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">$ {{ (item.product.price * item.quantity)|int }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                        <form action="{{ url_for('main.remove_from_cart', item_id=item.id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <button type="submit" class="text-red-600 hover:text-red-800">移除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<div class="row justify-content-end mt-4">
-    <div class="col-md-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h3 class="card-title mb-3">訂單總計</h3>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center fs-4 px-0">
-                        <strong>總金額</strong>
-                        <span class="text-danger fw-bold">NT$ {{ total_price|int }}</span>
-                    </li>
-                </ul>
-                <a href="{{ url_for('main.checkout') }}" class="btn btn-primary btn-lg w-100 mt-3">前往結帳</a>
-            </div>
+    <div class="bg-gray-50 px-6 py-4 flex justify-end items-center">
+        <div class="text-right">
+            <p class="text-lg font-semibold text-gray-800">總金額: <span class="text-blue-600">$ {{ total_price|int }}</span></p>
+            <a href="{{ url_for('main.checkout') }}" class="mt-4 inline-block bg-blue-600 text-white py-2 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors">前往結帳</a>
         </div>
     </div>
+    {% else %}
+    <div class="p-12 text-center">
+        <h2 class="text-xl font-medium text-gray-700">您的購物車是空的</h2>
+        <p class="text-gray-500 mt-2">快去逛逛，把喜歡的商品加進來吧！</p>
+        <a href="{{ url_for('main.home') }}" class="mt-6 inline-block bg-blue-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-600 transition-colors">繼續購物</a>
+    </div>
+    {% endif %}
 </div>
-
-{% else %}
-<div class="text-center py-5">
-    <i class="bi bi-cart-x" style="font-size: 5rem; color: #6c757d;"></i>
-    <h2 class="mt-4">您的購物車是空的</h2>
-    <p class="lead text-muted">快去逛逛，把喜歡的商品加進來吧！</p>
-    <a href="{{ url_for('main.home') }}" class="btn btn-primary btn-lg mt-3">開始購物</a>
-</div>
-{% endif %}
 {% endblock %}
