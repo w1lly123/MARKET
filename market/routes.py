@@ -1,12 +1,9 @@
-# 檔案: market/routes.py (重構後的版本)
-
 from flask import request, Blueprint
 from flask_jwt_extended import jwt_required
 from . import controllers
 
 main = Blueprint('main', __name__)
 
-# --- 公開頁面路由 ---
 @main.route("/")
 def home():
     return controllers.show_home_page()
@@ -20,7 +17,6 @@ def error():
 def product(product_id):
     return controllers.show_product_page(product_id)
 
-# --- 驗證流程路由 ---
 @main.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == 'POST':
@@ -38,7 +34,6 @@ def login():
 def logout():
     return controllers.handle_logout()
 
-# --- 使用者功能路由 ---
 @main.route("/cart")
 @jwt_required()
 def cart():
@@ -64,7 +59,6 @@ def checkout():
 def place_order():
     return controllers.handle_place_order()
 
-# --- 管理員路由 ---
 @main.route("/admin")
 @jwt_required()
 def admin():

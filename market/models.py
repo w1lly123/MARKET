@@ -40,7 +40,7 @@ class Order(db.Model):
     total_amount = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(db.String(20), nullable=False, default='Pending') # e.g., Pending, Shipped, Delivered
 
-    # 建立 Order 和 OrderItem 之間的一對多關聯
+    #建立 Order 和 OrderItem 之間的一對多關聯
     items = db.relationship('OrderItem', backref='order', lazy=True, cascade="all, delete-orphan")
     
 class OrderItem(db.Model):
@@ -49,6 +49,6 @@ class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Numeric(10, 2), nullable=False) # 儲存下單當時的價格
+    price = db.Column(db.Numeric(10, 2), nullable=False) #儲存下單當時的價格
 
     product = db.relationship('Product')

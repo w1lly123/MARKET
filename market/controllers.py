@@ -38,7 +38,6 @@ def show_cart_page():
     return render_template("cart.html", cart_items=cart_items, total_price=total_price)
 
 def show_admin_page():
-    """顯示管理後台頁面"""
     if not get_jwt().get("is_admin"):
         return redirect(url_for('main.error', msg="您沒有權限存取此頁面"))
         
@@ -47,7 +46,6 @@ def show_admin_page():
     return render_template("admin.html", products=products)
 
 def show_checkout_page():
-    """顯示結帳頁面"""
     user_id = get_jwt_identity()
     user = db.session.get(User, user_id)
     cart_items = user.cart_items
@@ -61,7 +59,6 @@ def show_checkout_page():
 # --- 處理動作 (Action Handling) 的 Controllers ---
 
 def handle_register_form():
-    """處理註冊表單提交"""
     nickname = request.form.get("nickname")
     email = request.form.get("email")
     password = request.form.get("password")
@@ -84,7 +81,6 @@ def handle_register_form():
     return response
 
 def handle_login_form():
-    """處理登入表單提交"""
     email = request.form.get("email")
     password = request.form.get("password")
     
@@ -104,13 +100,11 @@ def handle_login_form():
     return response
 
 def handle_logout():
-    """處理登出"""
     response = make_response(redirect(url_for('main.home')))
     unset_jwt_cookies(response)
     return response
 
 def handle_add_to_cart():
-    """處理加入購物車"""
     user_id = get_jwt_identity()
     product_id = request.form.get("product_id")
     quantity = int(request.form.get("quantity", 1))
@@ -128,7 +122,6 @@ def handle_add_to_cart():
     return redirect(url_for('main.cart'))
 
 def handle_remove_from_cart(item_id):
-    """處理從購物車移除商品"""
     user_id = get_jwt_identity()
     cart_item = CartItem.query.filter_by(id=item_id, user_id=user_id).first()
     if cart_item:
@@ -137,7 +130,6 @@ def handle_remove_from_cart(item_id):
     return redirect(url_for('main.cart'))
 
 def handle_add_product():
-    """處理新增商品"""
     if not get_jwt().get("is_admin"):
         return redirect(url_for('main.error', msg="權限不足"))
     
@@ -157,7 +149,6 @@ def handle_add_product():
     return redirect(url_for('main.admin'))
 
 def handle_delete_product(product_id):
-    """處理刪除商品"""
     if not get_jwt().get("is_admin"):
         return redirect(url_for('main.error', msg="權限不足"))
         
@@ -168,7 +159,6 @@ def handle_delete_product(product_id):
     return redirect(url_for('main.admin'))
 
 def handle_place_order():
-    """處理下訂單"""
     user_id = get_jwt_identity()
     user = db.session.get(User, user_id)
     cart_items = user.cart_items

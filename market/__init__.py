@@ -8,15 +8,12 @@ from flask_jwt_extended import JWTManager, get_jwt_identity, get_csrf_token
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
-
+#建立以及設定flask應用
 def create_app(config_class=Config):
-    """
-    應用程式工廠，用於建立和設定 Flask 應用實例。
-    """
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # 初始化擴充套件
+    #套件初始化
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
@@ -34,11 +31,11 @@ def create_app(config_class=Config):
         try:
             identity = get_jwt_identity()
             if identity:
-                # 從資料庫中查詢完整的使用者物件
+                #從資料庫中查詢完整的使用者物件
                 user = db.session.get(User, identity)
                 return dict(current_user=user)
         except Exception:
-            # 在沒有請求上下文或 JWT 無效時，靜默處理
+            #在沒有請求上下文或 JWT 無效時，靜默處理
             pass
         return dict(current_user=None)
 
