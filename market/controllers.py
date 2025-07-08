@@ -8,28 +8,28 @@ from flask_jwt_extended import (
 )
 
 
-def show_home_page():
+def home():
     products = Product.query.all()
     return render_template("home.html", products=products)
 
-def show_error_page():
+def error():
     msg = request.args.get("msg", "發生錯誤，請重新連線")
     return render_template("error.html", msg=msg)
 
-def show_register_page():
+def registe():
     return render_template("register.html")
 
-def show_login_page():
+def login():
     return render_template("login.html")
 
-def show_product_page(product_id):
+def product(product_id):
     product = db.session.get(Product, product_id)
     if not product:
         return redirect(url_for('main.error', msg="找不到此商品"))
     
     return render_template("product.html", product=product)
 
-def show_cart_page():
+def cart():
     user_id = get_jwt_identity()
     user = db.session.get(User, user_id)
     cart_items = user.cart_items
@@ -37,7 +37,7 @@ def show_cart_page():
      
     return render_template("cart.html", cart_items=cart_items, total_price=total_price)
 
-def show_admin_page():
+def admin():
     if not get_jwt().get("is_admin"):
         return redirect(url_for('main.error', msg="您沒有權限存取此頁面"))
         
@@ -45,7 +45,7 @@ def show_admin_page():
     
     return render_template("admin.html", products=products)
 
-def show_checkout_page():
+def checkout():
     user_id = get_jwt_identity()
     user = db.session.get(User, user_id)
     cart_items = user.cart_items
@@ -58,7 +58,7 @@ def show_checkout_page():
 
 # --- 處理動作 (Action Handling) 的 Controllers ---
 
-def handle_register_form():
+def register():
     nickname = request.form.get("nickname")
     email = request.form.get("email")
     password = request.form.get("password")
@@ -80,7 +80,7 @@ def handle_register_form():
     set_access_cookies(response, access_token)
     return response
 
-def handle_login_form():
+def login():
     email = request.form.get("email")
     password = request.form.get("password")
     
@@ -99,12 +99,8 @@ def handle_login_form():
     set_access_cookies(response, access_token)
     return response
 
-def handle_logout():
-    response = make_response(redirect(url_for('main.home')))
-    unset_jwt_cookies(response)
-    return response
 
-def handle_add_to_cart():
+def add_to_cart():
     user_id = get_jwt_identity()
     product_id = request.form.get("product_id")
     quantity = int(request.form.get("quantity", 1))
@@ -121,7 +117,7 @@ def handle_add_to_cart():
     db.session.commit()
     return redirect(url_for('main.cart'))
 
-def handle_remove_from_cart(item_id):
+def remove_from_cart(item_id):
     user_id = get_jwt_identity()
     cart_item = CartItem.query.filter_by(id=item_id, user_id=user_id).first()
     if cart_item:
@@ -129,7 +125,7 @@ def handle_remove_from_cart(item_id):
         db.session.commit()
     return redirect(url_for('main.cart'))
 
-def handle_add_product():
+def add_product():
     if not get_jwt().get("is_admin"):
         return redirect(url_for('main.error', msg="權限不足"))
     
@@ -148,7 +144,7 @@ def handle_add_product():
     db.session.commit()
     return redirect(url_for('main.admin'))
 
-def handle_delete_product(product_id):
+def delete_product(product_id):
     if not get_jwt().get("is_admin"):
         return redirect(url_for('main.error', msg="權限不足"))
         
@@ -158,7 +154,7 @@ def handle_delete_product(product_id):
         db.session.commit()
     return redirect(url_for('main.admin'))
 
-def handle_place_order():
+def place_order():
     user_id = get_jwt_identity()
     user = db.session.get(User, user_id)
     cart_items = user.cart_items
