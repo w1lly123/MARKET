@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}金流付款 - 我的商店{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center" style="min-height: calc(100vh - 200px);">
+    <div class="text-center bg-white p-12 rounded-lg shadow-2xl max-w-lg mx-auto">
+        <svg class="mx-auto h-16 w-16 text-blue-500 animate-pulse" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+        <h1 class="mt-6 text-2xl font-bold text-gray-800">正在前往付款頁面</h1>
+        <p class="mt-4 text-gray-600">請稍候，即將為您跳轉到安全的付款頁面...</p>
+        
+        <!-- 
+            【修正】
+            - action 指向 payment_info 字典中的 'action' key
+            - for 迴圈遍歷 payment_info 字典中的 'parameters' key
+        -->
+        <form id="payment-form" action="{{ payment_info.action }}" method="POST" class="hidden">
+            {% for key, value in payment_info.parameters.items() %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endfor %}
+        </form>
+        
+        <div class="mt-8">
+            <button onclick="submitPayment()" class="bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                手動前往付款
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function submitPayment() {
+    document.getElementById('payment-form').submit();
+}
+
+// 在頁面載入後，延遲 1 秒自動提交表單
+window.onload = function() {
+    setTimeout(function() {
+        submitPayment();
+    }, 1000); // 延遲 1 秒，給使用者一點反應時間
+};
+</script>
+{% endblock %}

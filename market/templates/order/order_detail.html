@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}訂單詳情 {{ order.id }} - 我的商店{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('order.order_history') }}" class="text-blue-600 hover:underline mb-6 inline-block">&larr; 返回訂單列表</a>
+<h1 class="text-3xl font-bold mb-2 text-gray-800">訂單詳情</h1>
+<p class="text-sm font-mono text-gray-500 mb-8">訂單編號：{{ order.id }}</p>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">購買項目</h2>
+            <div class="space-y-4">
+                {% for item in order.items %}
+                <div class="flex items-center justify-between border-b pb-4">
+                    <div class="flex items-center">
+                        <img class="h-16 w-16 rounded-md object-cover" src="{{ item.product.image_url or 'https://placehold.co/100x100/e2e8f0/cbd5e0?text=Img' }}" alt="">
+                        <div class="ml-4">
+                            <p class="font-medium text-gray-900">{{ item.product.name }}</p>
+                            <p class="text-sm text-gray-500">數量：{{ item.quantity }}</p>
+                        </div>
+                    </div>
+                    <p class="text-lg font-semibold text-gray-800">$ {{ (item.price * item.quantity)|int }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="lg:col-span-1">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">訂單資訊</h2>
+            <div class="space-y-3 text-gray-700">
+                <div class="flex justify-between"><span>訂購日期</span> <span class="font-medium">{{ order.created_at.strftime('%Y-%m-%d') }}</span></div>
+                <div class="flex justify-between"><span>訂單狀態</span> 
+                    <span class="font-medium">
+                        {% if order.status == 'paid' %}已付款{% else %}待付款{% endif %}
+                    </span>
+                </div>
+                <hr class="my-3">
+                <div class="flex justify-between text-xl font-bold"><span>總金額</span> <span class="text-blue-600">$ {{ order.total_amount|int }}</span></div>
+            </div>
+            
+            <h2 class="text-xl font-semibold mt-8 mb-4">配送地址</h2>
+            <p class="text-gray-600 leading-relaxed">{{ order.shipping_address }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

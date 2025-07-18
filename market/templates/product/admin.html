@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}管理後台 - 我的商店{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-8 text-gray-800">管理後台</h1>
+
+<!-- 新增商品表單 -->
+<div class="bg-white p-8 rounded-lg shadow-lg mb-10">
+    <h2 class="text-2xl font-semibold mb-6">新增商品</h2>
+    <form action="{{ url_for('product.add_product') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">商品名稱</label>
+                <input type="text" name="name" id="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="price" class="block text-sm font-medium text-gray-700">價格</label>
+                <input type="number" name="price" id="price" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="md:col-span-2">
+                <label for="description" class="block text-sm font-medium text-gray-700">商品描述</label>
+                <textarea name="description" id="description" rows="4" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+            </div>
+            <div class="md:col-span-2">
+                <label for="image_url" class="block text-sm font-medium text-gray-700">圖片網址 (選填)</label>
+                <input type="text" name="image_url" id="image_url" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+        <div class="mt-6 text-right">
+            <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">新增商品</button>
+        </div>
+    </form>
+</div>
+
+<!-- 商品列表 -->
+<div class="bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold mb-6">現有商品列表</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品名稱</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">價格</th>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for product in products %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.id }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$ {{ product.price|int }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <form action="{{ url_for('product.delete_product', product_id=product.id) }}" method="POST" class="inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('您確定要刪除此商品嗎？')">刪除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">目前沒有任何商品</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

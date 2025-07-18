@@ -1,13 +1,11 @@
-# seed_database.py
-
 from market import create_app, db
 from market.models import Product
 
+# 建立 Flask app 實例並取得應用程式上下文
 app = create_app()
 
-# 這裡是我們要新增的範例商品資料
+# 這是我們要新增的 K-POP 專輯範例資料
 product_data = [
-    # 1. BTS
     {
         'name': "BTS - Love Yourself 結 'Answer'",
         'price': 850.00,
@@ -85,10 +83,11 @@ def seed_data():
         for item in product_data:
             product = Product(
                 name=item['name'],
-                price=item['price'],
+                # 【修正】將價格轉換為整數，以符合 models.py 中的定義
+                price=int(item['price']),
                 description=item['description'],
-                image_url=item['image_url'],
-                quantity=100
+                image_url=item['image_url']
+                # 【修正】移除 quantity，因為 Product 模型中已無此欄位
             )
             db.session.add(product)
         
@@ -97,10 +96,10 @@ def seed_data():
         
         print("\n--- 開始驗證資料庫 ---")
         try:
-            product_count = Product.query.count()
+            product_count = db.session.query(Product).count()
             print(f"驗證成功：在資料庫中找到 {product_count} 筆商品資料。")
             if product_count > 0:
-                first_product = Product.query.first()
+                first_product = db.session.query(Product).first()
                 print(f"第一筆商品是：{first_product.name}")
         except Exception as e:
             print(f"驗證失敗：查詢資料庫時發生錯誤: {e}")

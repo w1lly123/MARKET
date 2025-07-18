@@ -1,62 +1,61 @@
-from flask import Flask, request
+import os
+from flask import Flask, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from .config import Config
-from flask_jwt_extended import JWTManager, get_jwt_identity, get_csrf_token
-
+from flask_jwt_extended import JWTManager, get_jwt_identity, get_csrf_token, verify_jwt_in_request
+from config import config
 
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
-#建立以及設定flask應用
-def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(config_class)
 
-    #套件初始化
+def create_app(config_name=None):
+    if config_name is None:
+        config_name = os.getenv('FLASK_ENV', 'default')
+
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
 
-    from .models import User 
-    # --- 內容處理器 (Context Processors) ---
-    # 透過它們注入的變數，可以在所有 Jinja2 模板中直接使用。
+    # --- 註冊藍圖 (Blueprints) ---
+    from .routes.auth_route import auth_bp
+    from .routes.product_route import product_bp
+    from .routes.order_route import order_bp
+    
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(product_bp)
+    app.register_blueprint(order_bp, url_prefix='/order')
+    
+    from . import models
 
+    # --- 內容處理器 (Context Processor) ---
     @app.context_processor
-    def inject_current_user():
+    def inject_user_and_csrf():
         """
-        注入當前登入的使用者物件。
-        如果使用者未登入，則 current_user 為 None。
+        將當前登入的使用者物件 (current_user) 和 CSRF 權杖 (csrf_token)
+        注入到所有模板中，方便直接使用。
         """
-        try:
-            identity = get_jwt_identity()
-            if identity:
-                #從資料庫中查詢完整的使用者物件
-                user = db.session.get(User, identity)
-                return dict(current_user=user)
-        except Exception:
-            #在沒有請求上下文或 JWT 無效時，靜默處理
-            pass
-        return dict(current_user=None)
+        from .models import User
 
-    @app.context_processor
-    def inject_csrf_token():
-        """
-        注入 CSRF Token，方便在 AJAX 和表單中使用。
-        """
-        try:
-            # 必須在有 access_token_cookie 的情況下才能生成 CSRF Token
+        # 使用 verify_jwt_in_request(optional=True)
+        # 這個函式會溫和地檢查請求中是否有 JWT。
+        # 如果有，後續的 get_jwt_identity() 就能安全執行。
+        # 如果沒有（例如在公開頁面），它也不會拋出錯誤。
+        verify_jwt_in_request(optional=True)
+        
+        identity = get_jwt_identity()
+        user = db.session.get(User, identity) if identity else None
+        
+        csrf = None
+        # 只有在確認使用者已登入的情況下，才去嘗試取得 CSRF 權杖
+        if identity:
             encoded_token = request.cookies.get('access_token_cookie')
             if encoded_token:
-                return dict(csrf_token=get_csrf_token(encoded_token))
-        except Exception:
-            pass
-        return dict(csrf_token=None)
-
-
-    # --- 註冊藍圖 ---
-    # 確保在函式內部導入，避免循環依賴
-    from .routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+                csrf = get_csrf_token(encoded_token)
+        
+        return dict(current_user=user, csrf_token=csrf)
 
     return app
